@@ -1,4 +1,3 @@
-
 ///--flutter   lifecycle  ////////////////////////////
 ///  1----initstate is called only once when the widget is created,
 ///  2---didChangeDependencies()  is called after the initState() and can call multiple time  If any of these dependencies change — for instance, if the theme is updated or if the device orientation changes — didChangeDependencies() is called again to ensure the widget updates to reflect these new values.
@@ -10,78 +9,86 @@
 ///package=> package can add new functionality available to flutter || do not need any native code ||all code in dart
 ///plugin=>is also special kind of package ||in which u can have native code ||camera, url_launcher, shared_preferences, connectivity.
 /// modules => module used to integrated flutter with existing native application | Use modules when you have an existing native app and want to add Flutter features without fully migrating the app to Flutter.
-
 import 'package:flutter/material.dart';
-void main() {
-  runApp(const MyApp());
-}
+
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'Flutter Demo',
-
-      home:  MyHomePage(title: 'Flutter Demo Home Page'),
+    return MaterialApp(
+      title: 'Flutter Reversi',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const HomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-
-
-  final String title;
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _HomePageState extends State<HomePage> {
+  late TextEditingController _controller;
+  String? _reversed; // Changed to nullable String to handle uninitialized state
 
-  void _incrementCounter() {
-    setState(() {
-
-      _counter++;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
-
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-
-        title: Text(widget.title),
+        title: const Text('Flutter Reverse'),
       ),
-      body: Center(
-
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+            TextField(
+              controller: _controller,
+              decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: "Enter string to reverse"),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+            const SizedBox(height: 10.0),
+            if (_reversed !=
+                null) // Display _reversed only if it is initialized
+              Text(
+                _reversed!,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18.0,
+                ),
+              ),
+            const SizedBox(height: 10.0),
+            ElevatedButton(
+              child: const Text("Reverse"),
+              onPressed: () {
+                if (_controller.text.isEmpty) return;
+                setState(() {
+                  _reversed = reverseString(_controller.text);
+                });
+              },
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+}
+
+String reverseString(String initial) {
+  return initial.split('').reversed.join();
 }
